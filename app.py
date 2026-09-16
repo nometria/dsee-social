@@ -24,11 +24,12 @@ Env:
 from __future__ import annotations
 import os
 import json
+import time
 import datetime as _dt
 from pathlib import Path
 
 import requests
-from flask import Flask, render_template, request, send_from_directory, abort
+from flask import Flask, render_template, request, send_from_directory, abort, jsonify
 
 app = Flask(__name__)
 
@@ -116,6 +117,82 @@ def tiktok_callback():
 
     # No secrets on this instance — show the code for the CLI paste flow.
     return render_template("callback.html", **ctx(status="code", code=code, state=state))
+
+
+# --------------------------------------------------------------------------- #
+# TEMPORARY test-post endpoint — proves the TikTok pipeline end-to-end from the
+# US Render box (where the token lives). Key-gated (X-Test-Key == client secret).
+# Remove after testing. Posts a bundled 1080x1920 clip; SELF_ONLY (private) via
+# Direct Post, falling back to an inbox draft if the sandbox app can't Direct Post.
+# --------------------------------------------------------------------------- #
+TEST_VIDEO = Path(__file__).resolve().parent / "test_clip.mp4"
+
+
+def _tt_access_token() -> str:
+    saved = json.loads((STATE_DIR / "tiktok_token.json").read_text())
+    r = requests.post(f"{TT_API}/v2/oauth/token/", data={
+        "client_key": CLIENT_KEY, "client_secret": CLIENT_SECRET,
+        "grant_type": "refresh_token", "refresh_token": saved["refresh_token"]}, timeout=30).json()
+    if "access_token" not in r:
+        raise RuntimeError(f"token refresh failed: {r}")
+    if r.get("refresh_token"):
+        saved.update(r)
+        (STATE_DIR / "tiktok_token.json").write_text(json.dumps(saved, indent=2))
+    return r["access_token"]
+
+
+def _tt_upload(hdr: dict, init_url: str, payload: dict) -> dict:
+    size = TEST_VIDEO.stat().st_size
+    init = requests.post(init_url, headers=hdr, json=payload, timeout=60).json()
+    data = init.get("data") or {}
+    upload_url, publish_id = data.get("upload_url"), data.get("publish_id")
+    if not upload_url:
+        return {"ok": False, "init": init}
+    put = requests.put(upload_url, data=TEST_VIDEO.read_bytes(), timeout=300, headers={
+        "Content-Type": "video/mp4", "Content-Range": f"bytes 0-{size - 1}/{size}"})
+    if put.status_code not in (200, 201, 206):
+        return {"ok": False, "init": init, "upload_http": put.status_code, "upload_text": put.text[:200]}
+    final = None
+    for _ in range(20):
+        final = requests.post(f"{TT_API}/v2/post/publish/status/fetch/", headers=hdr,
+                              json={"publish_id": publish_id}, timeout=30).json().get("data", {})
+        if final.get("status") in ("PUBLISH_COMPLETE", "SEND_TO_USER_INBOX", "FAILED", "DROPPED"):
+            break
+        time.sleep(3)
+    ok = bool(final) and final.get("status") in ("PUBLISH_COMPLETE", "SEND_TO_USER_INBOX")
+    return {"ok": ok, "publish_id": publish_id, "final": final, "init": init}
+
+
+@app.route("/tiktok/test-post", methods=["POST"])
+def tiktok_test_post():
+    if not CLIENT_SECRET or request.headers.get("X-Test-Key") != CLIENT_SECRET:
+        abort(403)
+    if not (STATE_DIR / "tiktok_token.json").exists():
+        return jsonify(ok=False, error="No stored token — re-authorize first."), 400
+    if not TEST_VIDEO.exists():
+        return jsonify(ok=False, error="test_clip.mp4 not deployed"), 500
+    try:
+        at = _tt_access_token()
+    except Exception as e:  # noqa: BLE001
+        return jsonify(ok=False, step="token", error=str(e)), 500
+    hdr = {"Authorization": f"Bearer {at}", "Content-Type": "application/json; charset=UTF-8"}
+    ci = requests.post(f"{TT_API}/v2/post/publish/creator_info/query/", headers=hdr, timeout=30).json()
+    allowed = (ci.get("data") or {}).get("privacy_level_options") or []
+    privacy = "SELF_ONLY" if "SELF_ONLY" in allowed else (allowed[0] if allowed else "SELF_ONLY")
+    size = TEST_VIDEO.stat().st_size
+    title = "Test: k-means clustering · Data Science, End to End #datascience #machinelearning"
+    src = {"source": "FILE_UPLOAD", "video_size": size, "chunk_size": size, "total_chunk_count": 1}
+
+    direct = _tt_upload(hdr, f"{TT_API}/v2/post/publish/video/init/", {
+        "post_info": {"title": title, "privacy_level": privacy,
+                      "disable_comment": False, "disable_duet": False, "disable_stitch": False},
+        "source_info": src})
+    if direct.get("ok"):
+        return jsonify(ok=True, path="direct_post_private", privacy=privacy, creator_info=ci, result=direct)
+
+    inbox = _tt_upload(hdr, f"{TT_API}/v2/post/publish/inbox/video/init/", {"source_info": src})
+    return jsonify(ok=bool(inbox.get("ok")), path="inbox_draft", creator_info=ci,
+                   direct_post_attempt=direct, result=inbox), (200 if inbox.get("ok") else 502)
 
 
 @app.route("/<path:fname>")
