@@ -92,22 +92,27 @@ def tiktok_callback():
 
     # If we can, finish the exchange server-side and persist the token — no copy-paste needed.
     if CLIENT_KEY and CLIENT_SECRET and REDIRECT_URI:
-        clean = code.split("*")[0]
-        try:
-            tok = requests.post(f"{TT_API}/v2/oauth/token/", data={
-                "client_key": CLIENT_KEY, "client_secret": CLIENT_SECRET,
-                "grant_type": "authorization_code", "code": clean,
-                "redirect_uri": REDIRECT_URI}, timeout=30).json()
-        except Exception as e:  # noqa: BLE001
-            return render_template("callback.html", **ctx(
-                status="error", detail=f"Token exchange request failed: {e}", code=code, state=state))
-        if "refresh_token" in tok:
-            STATE_DIR.mkdir(parents=True, exist_ok=True)
-            (STATE_DIR / "tiktok_token.json").write_text(json.dumps(tok, indent=2))
-            return render_template("callback.html", **ctx(status="stored", state=state))
-        return render_template("callback.html", **ctx(
-            status="error", detail=f"TikTok rejected the code: {tok.get('error_description', tok)}",
-            code=code, state=state))
+        # Send the code EXACTLY as received (Flask has already URL-decoded it once). TikTok v2 codes
+        # legitimately contain '*' and end in a region tag like '.e1' — do NOT truncate. As a safety
+        # net, if the full code is rejected we retry with the pre-'*' portion; a wrong variant does not
+        # consume a valid single-use code, so trying both on one code is safe.
+        variants = [code] + ([code.split("*")[0]] if "*" in code else [])
+        detail = "No response from TikTok's token endpoint."
+        for cand in variants:
+            try:
+                tok = requests.post(f"{TT_API}/v2/oauth/token/", data={
+                    "client_key": CLIENT_KEY, "client_secret": CLIENT_SECRET,
+                    "grant_type": "authorization_code", "code": cand,
+                    "redirect_uri": REDIRECT_URI}, timeout=30).json()
+            except Exception as e:  # noqa: BLE001
+                detail = f"Token exchange request failed: {e}"
+                continue
+            if "refresh_token" in tok:
+                STATE_DIR.mkdir(parents=True, exist_ok=True)
+                (STATE_DIR / "tiktok_token.json").write_text(json.dumps(tok, indent=2))
+                return render_template("callback.html", **ctx(status="stored", state=state))
+            detail = f"TikTok rejected the code: {tok.get('error_description', tok.get('error', tok))}"
+        return render_template("callback.html", **ctx(status="error", detail=detail, code=code, state=state))
 
     # No secrets on this instance — show the code for the CLI paste flow.
     return render_template("callback.html", **ctx(status="code", code=code, state=state))
