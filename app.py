@@ -43,7 +43,7 @@ TT_API = "https://open.tiktokapis.com"
 CLIENT_KEY = os.getenv("TIKTOK_CLIENT_KEY", "")
 CLIENT_SECRET = os.getenv("TIKTOK_CLIENT_SECRET", "")
 REDIRECT_URI = os.getenv("TIKTOK_REDIRECT_URI", "")
-STATE_DIR = Path(os.getenv("TIKTOK_STATE_DIR", "/data"))
+STATE_DIR = Path(os.getenv("TIKTOK_STATE_DIR", "/tmp/tiktok-state"))  # /data when a disk is mounted
 VERIFY_META = os.getenv("TIKTOK_VERIFY_META", "")  # TikTok domain-verification <meta> content
 WELL_KNOWN = Path(__file__).resolve().parent / "well_known"
 
