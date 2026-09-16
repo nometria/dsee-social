@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ brand }}{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="kicker">A learning project by {{ author }}</div>
+  <h1>Data Science, End to End</h1>
+  <p class="lead">A practitioner-grade path from raw data to shipped, responsible machine-learning
+  systems — taught as a book, and as short, original explainer videos for people learning data science.</p>
+  <a class="btn" href="{{ book_url }}">Read the book</a>
+  <a class="btn ghost" href="{{ youtube }}">Watch on YouTube</a>
+</section>
+
+<div class="grid">
+  <div class="card">
+    <h3>Short explainer videos</h3>
+    <p>Each clip takes one concept — a common mistake, an interview question, an intuition —
+    and explains it in under a minute, with original narration and artwork.</p>
+  </div>
+  <div class="card">
+    <h3>Published across platforms</h3>
+    <p>The same educational shorts are shared on YouTube, TikTok and other networks so learners
+    can find them wherever they already are.</p>
+  </div>
+  <div class="card">
+    <h3>Concept first, jargon later</h3>
+    <p>Every topic leads with a picture or analogy a total beginner can feel, then names the
+    technical idea behind it.</p>
+  </div>
+  <div class="card">
+    <h3>One complete curriculum</h3>
+    <p>The videos map to the chapters of the book: data wrangling, statistics, machine learning,
+    evaluation and responsible deployment.</p>
+  </div>
+</div>
+
+<hr class="rule">
+
+<p style="color:var(--muted); font-size:15px;">
+  This site is operated by {{ author }} to publish original data-science education content and to
+  connect authorized social accounts for cross-posting that content. Questions? Email
+  <a href="mailto:{{ contact }}">{{ contact }}</a>. See our
+  <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
+</p>
+{% endblock %}

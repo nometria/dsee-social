@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}TikTok authorization · {{ brand }}{% endblock %}
+{% block content %}
+<article class="legal">
+  {% if status == "stored" %}
+    <h1>✓ TikTok connected</h1>
+    <p><span class="badge ok">Authorized</span></p>
+    <p>Your TikTok account is now connected and the access token has been saved securely on the server.
+    You can close this tab — the cross-poster will publish on the schedule you set. No further action is needed.</p>
+  {% elif status == "code" %}
+    <h1>Authorization code received</h1>
+    <p>Copy the code below and paste it into the terminal running
+    <span class="mono">crosspost_tiktok.py --authorize</span>:</p>
+    <div class="codebox">{{ code }}</div>
+    {% if state %}<p style="color:var(--muted);font-size:14px;">state: <span class="mono">{{ state }}</span></p>{% endif %}
+    <p style="color:var(--muted);font-size:14px;">This code expires within a few minutes — use it promptly.</p>
+  {% else %}
+    <h1>Authorization problem</h1>
+    <p><span class="badge warn">Not connected</span></p>
+    <p>{{ detail or "Something went wrong during authorization." }}</p>
+    {% if code %}<p>If you are using the manual flow, your code is:</p><div class="codebox">{{ code }}</div>{% endif %}
+    <p style="color:var(--muted);font-size:14px;">You can safely retry the authorization from the start.</p>
+  {% endif %}
+  <hr class="rule">
+  <p style="font-size:14px;color:var(--muted);">Return to <a href="/">home</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
+</article>
+{% endblock %}

@@ -1,0 +1,33 @@
+# Render Blueprint — deploys the public site + TikTok OAuth callback as ONE web service
+# on Render's own HTTPS domain (https://<name>.onrender.com). No custom domain required.
+#
+# This folder (marketing/social/web) is meant to be its OWN git repo / deploy root, so the
+# public site is isolated from the book source. See README.md for the 5-minute setup.
+services:
+  - type: web
+    name: dsee-social                # -> https://dsee-social.onrender.com (rename if taken)
+    runtime: python
+    region: virginia                 # US East — required (TikTok is blocked from India)
+    plan: starter                    # Starter ($7/mo) — needed for the persistent disk below
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /healthz
+    autoDeploy: true
+    disk:
+      name: tiktok-state             # persists the rotating TikTok refresh token across deploys
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      - key: TIKTOK_STATE_DIR
+        value: /data
+      # Set these three in the Render dashboard (Environment tab) — NOT committed here:
+      - key: TIKTOK_REDIRECT_URI     # = https://<this-service>.onrender.com/tiktok/callback
+        sync: false
+      - key: TIKTOK_CLIENT_KEY
+        sync: false
+      - key: TIKTOK_CLIENT_SECRET
+        sync: false
+      - key: TIKTOK_VERIFY_META      # optional: TikTok domain-verification meta content
+        sync: false

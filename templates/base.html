@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ brand }}{% endblock %}</title>
+  <meta name="description" content="{{ brand }} — a practitioner-grade data science & machine learning learning project by {{ author }}.">
+  {% if verify_meta %}<meta name="tiktok-developers-site-verification" content="{{ verify_meta }}">{% endif %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site">
+    <div class="wrap">
+      <a class="logo" href="/">Data Science, <b>End to End</b></a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/terms">Terms</a>
+        <a href="/privacy">Privacy</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site">
+    <div class="wrap">
+      <span>&copy; {{ year }} {{ author }} · {{ brand }}</span>
+      <span>
+        <a href="/terms">Terms</a> &nbsp;·&nbsp;
+        <a href="/privacy">Privacy</a> &nbsp;·&nbsp;
+        <a href="mailto:{{ contact }}">{{ contact }}</a>
+      </span>
+    </div>
+  </footer>
+</body>
+</html>

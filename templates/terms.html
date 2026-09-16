@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Terms of Service · {{ brand }}{% endblock %}
+{% block content %}
+<article class="legal">
+  <h1>Terms of Service</h1>
+  <div class="updated">Last updated: {{ updated }}</div>
+
+  <p>These Terms of Service ("Terms") govern your use of the website at this domain and the related
+  content-publishing tools (together, the "Service") operated by {{ author }} ("we", "us", "our") in
+  connection with the <em>{{ brand }}</em> project. By using the Service or authorizing it to connect
+  to your social-media account, you agree to these Terms.</p>
+
+  <h2>1. What the Service does</h2>
+  <p>The Service publishes original educational videos and articles about data science and machine
+  learning, and — where you explicitly authorize it — posts that content to social-media accounts you
+  control on your behalf. It is an educational and content-distribution tool. It is not affiliated with,
+  endorsed by, or sponsored by TikTok, YouTube, Google, or any other platform.</p>
+
+  <h2>2. Authorization and your account</h2>
+  <p>When you connect a third-party account (for example, via TikTok Login), you authorize the Service
+  to act within the specific permissions (scopes) you grant — for example, to read your basic profile
+  information and to upload and publish videos you have chosen to that account. You may revoke this
+  authorization at any time from your platform's connected-apps settings, after which the Service can
+  no longer act on your behalf. You are responsible for maintaining the security of your accounts.</p>
+
+  <h2>3. Acceptable use</h2>
+  <ul>
+    <li>Use the Service only for lawful purposes and only with accounts you own or are authorized to manage.</li>
+    <li>Do not use the Service to post content you do not have the rights to, or that violates the rules of
+    the destination platform.</li>
+    <li>Do not attempt to disrupt, reverse-engineer, or gain unauthorized access to the Service or its data.</li>
+    <li>You must comply with the terms and community guidelines of any platform you connect, including the
+    <a href="https://www.tiktok.com/legal/page/global/terms-of-service/en" target="_blank" rel="noopener">TikTok Terms of Service</a>.</li>
+  </ul>
+
+  <h2>4. Content and intellectual property</h2>
+  <p>The educational videos, artwork, narration, text, and the book are the intellectual property of
+  {{ author }} and may not be reproduced or redistributed except as offered through the Service. Content
+  you supply or accounts you connect remain yours; you grant us only the limited permission needed to
+  publish the content you have selected to the destinations you have authorized.</p>
+
+  <h2>5. Disclaimer</h2>
+  <p>The Service and its educational content are provided "as is", for general learning purposes, without
+  warranties of any kind. We do not guarantee that publishing will always succeed, that a platform will
+  keep any post live, or that the content is error-free or suitable for any particular purpose.</p>
+
+  <h2>6. Limitation of liability</h2>
+  <p>To the maximum extent permitted by law, we are not liable for any indirect, incidental, or
+  consequential damages, or for any loss of data, reach, or account standing, arising from your use of the
+  Service or from the action of any third-party platform.</p>
+
+  <h2>7. Changes</h2>
+  <p>We may update these Terms from time to time. Material changes will be reflected by the "Last updated"
+  date above. Continued use of the Service after a change constitutes acceptance of the revised Terms.</p>
+
+  <h2>8. Contact</h2>
+  <p>Questions about these Terms? Email <a href="mailto:{{ contact }}">{{ contact }}</a>.</p>
+</article>
+{% endblock %}
