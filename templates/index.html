@@ -1,44 +1,84 @@
 {% extends "base.html" %}
-{% block title %}{{ brand }}{% endblock %}
+{% block title %}{{ brand }} — the book series{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="kicker">A learning project by {{ author }}</div>
-  <h1>Data Science, End to End</h1>
-  <p class="lead">A practitioner-grade path from raw data to shipped, responsible machine-learning
-  systems — taught as a book, and as short, original explainer videos for people learning data science.</p>
-  <a class="btn" href="{{ book_url }}">Read the book</a>
-  <a class="btn ghost" href="{{ youtube }}">Watch on YouTube</a>
+<style>
+  .hero2 { padding: 54px 0 20px; text-align: center; }
+  .hero2 .kicker { color: var(--terracotta); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; }
+  .hero2 h1 { font-family: var(--serif); font-size: clamp(32px, 5vw, 52px); line-height: 1.08; margin: 12px 0 10px; font-weight: 600; }
+  .hero2 p.lead { font-size: 19px; color: var(--muted); max-width: 640px; margin: 0 auto 24px; }
+  .hero2 .ctas .btn { margin: 4px; }
+  .books { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin: 40px 0 8px; }
+  .vol { background: var(--card); border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+  .vol img { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-bottom: 1px solid var(--rule); background: #FBFAF7; }
+  .vol .body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
+  .vol h3 { font-family: var(--serif); font-size: 19px; margin: 0 0 2px; font-weight: 600; }
+  .vol .sub { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
+  .vol p { color: #44413a; font-size: 14px; margin: 0 0 16px; flex: 1; }
+  .vol .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .vol .price { font-family: var(--serif); font-size: 20px; color: var(--ink); font-weight: 600; }
+  .band { background: #fff; border: 1px solid var(--rule); border-left: 3px solid var(--terracotta); border-radius: 12px; padding: 20px 24px; margin: 28px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .band .t { font-family: var(--serif); font-size: 18px; }
+  .feat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 34px 0; }
+  .feat .f h4 { font-family: var(--serif); margin: 0 0 4px; font-size: 16px; }
+  .feat .f p { margin: 0; color: var(--muted); font-size: 14px; }
+  @media (max-width: 760px) { .books, .feat { grid-template-columns: 1fr; } }
+</style>
+
+<section class="hero2">
+  <div class="kicker">A practitioner's data-science series by {{ author }}</div>
+  <h1>Data Science, End to End<br>— Essentials</h1>
+  <p class="lead">Three compact, modern volumes that take you from raw data to large language models in production — the subset that working data scientists actually use, and nothing padded.</p>
+  <div class="ctas">
+    <a class="btn" href="#books">Get the books</a>
+    <a class="btn ghost" href="{{ youtube }}">Watch on YouTube</a>
+  </div>
 </section>
 
-<div class="grid">
-  <div class="card">
-    <h3>Short explainer videos</h3>
-    <p>Each clip takes one concept — a common mistake, an interview question, an intuition —
-    and explains it in under a minute, with original narration and artwork.</p>
+<section id="books">
+  <div class="books">
+    <div class="vol">
+      <img src="{{ url_for('static', filename='covers/vol1.png') }}" alt="Volume I — Foundations">
+      <div class="body">
+        <h3>Volume I — Foundations</h3>
+        <div class="sub">Python · Statistics · Essential SQL</div>
+        <p>The four things under every working data scientist: Python & pandas, statistics for decision-making, SQL, and the math models assume you know. ~280 pages.</p>
+        <div class="row"><span class="price">$14.99</span><a class="btn" href="https://fitoorihouse.gumroad.com/l/gclorp">Buy ebook</a></div>
+      </div>
+    </div>
+    <div class="vol">
+      <img src="{{ url_for('static', filename='covers/vol2.png') }}" alt="Volume II — Machine Learning">
+      <div class="body">
+        <h3>Volume II — Machine Learning</h3>
+        <div class="sub">Models · Ensembles · Forecasting</div>
+        <p>From your first supervised model to the gradient-boosted ensembles that win most real problems — plus clustering, time series, and the judgment to deploy them. ~280 pages.</p>
+        <div class="row"><span class="price">$14.99</span><a class="btn" href="https://fitoorihouse.gumroad.com/l/isqfh">Buy ebook</a></div>
+      </div>
+    </div>
+    <div class="vol">
+      <img src="{{ url_for('static', filename='covers/vol3.png') }}" alt="Volume III — Deep Learning, NLP & LLMs">
+      <div class="body">
+        <h3>Volume III — Deep Learning, NLP & LLMs</h3>
+        <div class="sub">Neural Nets · NLP · LLMs · Production</div>
+        <p>Neural networks from their parts, CNNs, transformers, and a full chapter on LLMs — prompting, RAG, fine-tuning, agents — then how to ship and govern them. ~290 pages.</p>
+        <div class="row"><span class="price">$14.99</span><a class="btn" href="https://fitoorihouse.gumroad.com/l/lzydj">Buy ebook</a></div>
+      </div>
+    </div>
   </div>
-  <div class="card">
-    <h3>Published across platforms</h3>
-    <p>The same educational shorts are shared on YouTube, TikTok and other networks so learners
-    can find them wherever they already are.</p>
+
+  <div class="band">
+    <span class="t">Paperbacks &amp; the complete reference edition are on the way.</span>
+    <a class="btn ghost" href="{{ book_url }}">The full book</a>
   </div>
-  <div class="card">
-    <h3>Concept first, jargon later</h3>
-    <p>Every topic leads with a picture or analogy a total beginner can feel, then names the
-    technical idea behind it.</p>
-  </div>
-  <div class="card">
-    <h3>One complete curriculum</h3>
-    <p>The videos map to the chapters of the book: data wrangling, statistics, machine learning,
-    evaluation and responsible deployment.</p>
-  </div>
-</div>
+</section>
+
+<section class="feat">
+  <div class="f"><h4>Latest tech, no filler</h4><p>Curated for how data science is practiced today — modern ML, deep learning, and generative AI get the room; dated techniques don't.</p></div>
+  <div class="f"><h4>Concept first, jargon later</h4><p>Every topic opens with a picture a beginner can feel, then names the technical idea behind it. Written to be understood, not to impress.</p></div>
+  <div class="f"><h4>Read in any order</h4><p>Three standalone volumes with a continuous arc. Comfortable with Python but shaky on confidence intervals? Start wherever you need to.</p></div>
+</section>
 
 <hr class="rule">
-
-<p style="color:var(--muted); font-size:15px;">
-  This site is operated by {{ author }} to publish original data-science education content and to
-  connect authorized social accounts for cross-posting that content. Questions? Email
-  <a href="mailto:{{ contact }}">{{ contact }}</a>. See our
-  <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
+<p style="color:var(--muted); font-size:15px; text-align:center;">
+  New explainer videos daily on <a href="{{ youtube }}">YouTube</a>. Questions? <a href="mailto:{{ contact }}">{{ contact }}</a>.
 </p>
 {% endblock %}
